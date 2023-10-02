@@ -1,0 +1,25 @@
+name: JSON Format Check
+
+on:
+  pull_request:
+    branches:
+      - main
+      
+jobs:
+  json-format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check JSON Format
+        uses: actions/checkout@v2
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq -y
+
+      - name: Validate JSON Format
+        run: |
+          if ! jq empty-check.json < contributors/profiles.json; then
+            echo "Invalid JSON format detected in the file."
+            exit 1
+          fi
