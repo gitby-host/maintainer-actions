@@ -3,8 +3,8 @@ name: JSON Format Check
 on:
   pull_request:
     branches:
-      - main
-      
+      - main 
+
 jobs:
   json-format-check:
     runs-on: ubuntu-latest
@@ -23,3 +23,11 @@ jobs:
             echo "Invalid JSON format detected in the file."
             exit 1
           fi
+
+      - name: Comment on PR
+        if: ${{ failure() }}
+        run: |
+          GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          COMMENT="Invalid JSON format detected in the file."
+          API_URL=$(jq -r .pull_request.comments_url "$GITHUB_EVENT_PATH")
+          curl -X POST -H "Authorization: token $GITHUB_TOKEN" -d "{\"body\":\"$COMMENT\"}" $API_URL
